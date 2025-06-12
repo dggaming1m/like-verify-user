@@ -69,13 +69,14 @@ async def like_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     markup = InlineKeyboardMarkup(kb)
     await update.message.reply_text(
-        f"*Like Request*
+    f"""*Like Request*
 👤 From: {name}
 🆔 UID: `{uid}`
 🌐 Region: IND
-⚠️ Verify within 10 minutes",
-        reply_markup=markup, parse_mode="Markdown"
-    )
+⚠️ Verify within 10 minutes""",
+    reply_markup=markup,
+    parse_mode="Markdown"
+)
 
 async def background_check(app):
     while True:
@@ -88,15 +89,15 @@ async def background_check(app):
                 f"✅ *Request Processed Successfully*
 
 "
-                f"👤 Player: {res['name']}
+                msg = f"""✅ *Request Processed Successfully*
+
+👤 Player: {res['name']}
 🆔 UID: `{uid}`
 🎖️ Level: {res['level']}
-"
-                f"🤡 Likes Before: {res['likes_before']}
+🤡 Likes Before: {res['likes_before']}
 📈 Likes Added: {res['likes_added']}
-"
-                f"🗿 Total Likes Now: {res['likes_after']}
-⏰ Processed At: {res['processed_at']}"
+🗿 Total Likes Now: {res['likes_after']}
+⏰ Processed At: {res['processed_at']}"""
             )
             await app.bot.send_message(chat_id=user_id, text=msg, parse_mode="Markdown")
             users.update_one({"user_id": user_id}, {"$set": {"like_sent": True}})
