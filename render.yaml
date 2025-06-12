@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: like-bot
+    env: python
+    buildCommand: ""
+    startCommand: "python bot.py"
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: MONGO_URL
+        sync: false
+      - key: SHORTNER_API
+        sync: false
+      - key: ALLOWED_ADMINS
+        sync: false
+      - key: BASE_VERIFY_URL
+        sync: false
+      - key: LIKE_API
+        sync: false
