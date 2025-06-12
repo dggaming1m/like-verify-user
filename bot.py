@@ -1,4 +1,3 @@
-
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -105,4 +104,3 @@ def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    
