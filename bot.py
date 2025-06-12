@@ -13,7 +13,8 @@ import asyncio
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 MONGO_URL = os.getenv("MONGO_URL")
 SHORTNER_API = os.getenv("SHORTNER_API")
-BASE_VERIFY_URL = os.getenv("BASE_VERIFY_URL")  # Replace with your hosted Flask domain
+BASE_VERIFY_URL = os.getenv("BASE_VERIFY_URL")
+LIKE_API = os.getenv("LIKE_API")
 
 client = MongoClient(MONGO_URL)
 db = client["likebot"]
@@ -41,14 +42,12 @@ def get_short_url(long_url):
     except:
         return long_url
 
-LIKE_API = os.getenv("LIKE_API")
-
 async def like_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     allowed_admins = os.getenv("ALLOWED_ADMINS", "").split(",")
     if str(update.effective_user.id) not in allowed_admins:
         await update.message.reply_text("🚫 You are not allowed to use this command.")
         return
+
     if not context.args:
         await update.message.reply_text("Usage: /like <uid>")
         return
@@ -58,7 +57,6 @@ async def like_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     verify_id = str(uuid.uuid4())
     verifications[verify_id] = {"user_id": user_id, "uid": uid}
-
     long_url = f"{BASE_VERIFY_URL}{verify_id}"
     short_url = get_short_url(long_url)
 
@@ -69,14 +67,14 @@ async def like_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     markup = InlineKeyboardMarkup(kb)
     await update.message.reply_text(
-    f"""*Like Request*
-👤 From: {name}
-🆔 UID: `{uid}`
-🌐 Region: IND
-⚠️ Verify within 10 minutes""",
-    reply_markup=markup,
-    parse_mode="Markdown"
-)
+        f"""*Like Request*
+From: {name}
+UID: `{uid}`
+Region: IND
+Verify within 10 minutes""",
+        reply_markup=markup,
+        parse_mode="Markdown"
+    )
 
 async def background_check(app):
     while True:
@@ -85,20 +83,15 @@ async def background_check(app):
             user_id = user["user_id"]
             api_url = LIKE_API.format(uid=uid)
             res = requests.get(api_url).json()
-            msg = (
-                f"✅ *Request Processed Successfully*
+            msg = f"""✅ *Request Processed Successfully*
 
-"
-                msg = f"""✅ *Request Processed Successfully*
-
-👤 Player: {res['name']}
-🆔 UID: `{uid}`
-🎖️ Level: {res['level']}
-🤡 Likes Before: {res['likes_before']}
-📈 Likes Added: {res['likes_added']}
-🗿 Total Likes Now: {res['likes_after']}
-⏰ Processed At: {res['processed_at']}"""
-            )
+Player: {res['name']}
+UID: `{uid}`
+Level: {res['level']}
+Likes Before: {res['likes_before']}
+Likes Added: {res['likes_added']}
+Total Likes Now: {res['likes_after']}
+Processed At: {res['processed_at']}"""
             await app.bot.send_message(chat_id=user_id, text=msg, parse_mode="Markdown")
             users.update_one({"user_id": user_id}, {"$set": {"like_sent": True}})
         await asyncio.sleep(60)
@@ -112,3 +105,4 @@ def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+    
